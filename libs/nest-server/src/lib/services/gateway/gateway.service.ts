@@ -2,8 +2,8 @@ import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, We
 import { ConnectorsRegistryService } from '../connectors-registry/connectors-registry.service';
 import { Socket } from 'socket.io';
 import { Injectable } from '@nestjs/common';
-import * as Server from '@nest-socket/server';
-import { TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@nest-socket/interfaces';
+import * as Server from '@node-socket/server';
+import { TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@node-socket/interfaces';
 
 @Injectable()
 @WebSocketGateway({ transports: ['websocket'] })

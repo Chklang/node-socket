@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 import { Subject } from 'rxjs';
-import { IErrorMessage, TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@nest-socket/interfaces';
+import { IErrorMessage, TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import { ConnectorsRegistryService } from './connectors-registry';
 
 export class ServerService {

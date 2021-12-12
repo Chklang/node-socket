@@ -8,7 +8,7 @@
       "options": {
         "main": "libs/server/src/index.ts",
         "tsConfig": "libs/server/tsconfig.lib.json",
-        "outputPath": "dist/@nest-socket/server",
+        "outputPath": "dist/@node-socket/server",
         "packageJson": "libs/server/package.json",
         "generatePackageJson": true
       }

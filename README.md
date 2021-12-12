@@ -2,21 +2,21 @@
 
 Project to simplify an implementation of bidirectionnal websocket with RXJS.
 
-## @nest-socket/interfaces
+## @node-socket/interfaces
 Interfaces of messages sent between client and server
 
-## @nest-socket/server
+## @node-socket/server
 Generic implementation of the server. Two classes :
 1. ServerService : The server implementation
 2. ConnectorsRegistryService : The registry to register all listeners.
 ```typescript
-// To use the ServerService, example of implementataion used in @nest-socket/server
-import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+// To use the ServerService, example of implementataion used in @node-socket/server
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nodejs/websockets';
 import { ConnectorsRegistryService } from '../connectors-registry/connectors-registry.service';
 import { Socket } from 'socket.io';
-import { Injectable } from '@nestjs/common';
-import * as Server from '@nest-socket/server';
-import { TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@nest-socket/interfaces';
+import { Injectable } from '@nodejs/common';
+import * as Server from '@node-socket/server';
+import { TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@node-socket/interfaces';
 
 @Injectable()
 @WebSocketGateway({ transports: ['websocket'] })
@@ -72,10 +72,10 @@ export class EchoService implements IConnector<string, string> {
 }
 ```
 
-## @nest-socket/client
+## @node-socket/client
 Generic implementation of a client
 1. SocketClient : The client
-2. ConnectorsRegistryService : The registry if client must listen messages when server has the initiative (implementation like @nest-socket/server/ConnectorsRegistryService)
+2. ConnectorsRegistryService : The registry if client must listen messages when server has the initiative (implementation like @node-socket/server/ConnectorsRegistryService)
 
 To use the client :
 ```typescript
@@ -99,12 +99,12 @@ echo$.next('echo - 3');
 echo$.complete();
 ```
 
-## @nest-socket/nest-server
+## @node-socket/nest-server
 An simple implementation for nest. Port used is the default of application, and WebsocketGateway is configured to use 'webcosket' transports.
 To use it :
 ```typescript
 // module.ts
-import { NestServerModule } from '@nest-socket/nest-server';
+import { NestServerModule } from '@node-socket/nest-server';
 @Module({
   imports: [NestServerModule],
   providers: [
@@ -116,8 +116,8 @@ export class AppModule {}
 
 // The EchoService
 import { Observable } from 'rxjs';
-import { ConnectorsRegistryService } from '@nest-socket/nest-server';
-import { IConnector } from '@nest-socket/server';
+import { ConnectorsRegistryService } from '@node-socket/nest-server';
+import { IConnector } from '@node-socket/server';
 
 @Injectable()
 export class EchoService implements IConnector<string, string> {

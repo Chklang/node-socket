@@ -1,10 +1,14 @@
 {
-  "name": "nest-socket",
+  "name": "node-socket",
   "version": "1.0.0",
   "license": "WTFPL",
   "author": "Chklang",
   "scripts": {
-    "start": "nx serve",
+    "publish": "npm run publish:interfaces && npm run publish:client && npm run publish:server && npm run publish:nest-server",
+    "publish:interfaces": "cd dist && cd @node-socket && cd interfaces && npm publish --access public",
+    "publish:client": "cd dist && cd @node-socket && cd client && npm publish --access public",
+    "publish:server": "cd dist && cd @node-socket && cd server && npm publish --access public",
+    "publish:nest-server": "cd dist && cd @node-socket && cd nest-server && npm publish --access public",
     "build": "nx run-many --target=build --all",
     "test": "nx run-many --target=test --all"
   },

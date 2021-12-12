@@ -7,7 +7,7 @@
       "builder": "@nrwl/node:package",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/@nest-socket/nest-server",
+        "outputPath": "dist/@node-socket/nest-server",
         "main": "libs/nest-server/src/index.ts",
         "tsConfig": "libs/nest-server/tsconfig.lib.json",
         "packageJson": "libs/nest-server/package.json",

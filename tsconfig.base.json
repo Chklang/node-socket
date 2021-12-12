@@ -15,10 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@nest-socket/client": ["libs/client/src/index.ts"],
-      "@nest-socket/interfaces": ["libs/interfaces/src/index.ts"],
-      "@nest-socket/nest-server": ["libs/nest-server/src/index.ts"],
-      "@nest-socket/server": ["libs/server/src/index.ts"]
+      "@node-socket/client": ["libs/client/src/index.ts"],
+      "@node-socket/interfaces": ["libs/interfaces/src/index.ts"],
+      "@node-socket/nest-server": ["libs/nest-server/src/index.ts"],
+      "@node-socket/server": ["libs/server/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

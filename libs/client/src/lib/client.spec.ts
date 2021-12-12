@@ -1,4 +1,4 @@
-import { TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@nest-socket/interfaces';
+import { TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import * as jestMock from 'jest-mock';
 import { catchError, of, Subject, take, tap } from 'rxjs';
 import { Socket } from 'socket.io-client';
