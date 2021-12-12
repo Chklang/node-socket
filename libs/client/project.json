@@ -1,0 +1,34 @@
+{
+  "root": "libs/client",
+  "sourceRoot": "libs/client/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "options": {
+        "main": "libs/client/src/index.ts",
+        "tsConfig": "libs/client/tsconfig.lib.json",
+        "outputPath": "dist/@nest-socket/client",
+        "packageJson": "libs/client/package.json",
+        "generatePackageJson": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/client/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/client"],
+      "options": {
+        "jestConfig": "libs/client/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["interfaces"]
+}

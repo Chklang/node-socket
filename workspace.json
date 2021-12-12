@@ -1,4 +1,9 @@
 {
   "version": 2,
-  "projects": {}
+  "projects": {
+    "client": "libs/client",
+    "interfaces": "libs/interfaces",
+    "nest-server": "libs/nest-server",
+    "server": "libs/server"
+  }
 }

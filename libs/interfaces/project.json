@@ -1,0 +1,33 @@
+{
+  "root": "libs/interfaces",
+  "sourceRoot": "libs/interfaces/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "options": {
+        "main": "libs/interfaces/src/index.ts",
+        "tsConfig": "libs/interfaces/tsconfig.lib.json",
+        "outputPath": "dist/@nest-socket/interfaces",
+        "packageJson": "libs/interfaces/package.json",
+        "generatePackageJson": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/interfaces/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/interfaces"],
+      "options": {
+        "jestConfig": "libs/interfaces/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

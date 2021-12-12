@@ -1,0 +1,34 @@
+{
+  "root": "libs/server",
+  "sourceRoot": "libs/server/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:package",
+      "options": {
+        "main": "libs/server/src/index.ts",
+        "tsConfig": "libs/server/tsconfig.lib.json",
+        "outputPath": "dist/@nest-socket/server",
+        "packageJson": "libs/server/package.json",
+        "generatePackageJson": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/server/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/server"],
+      "options": {
+        "jestConfig": "libs/server/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["interfaces"]
+}

@@ -14,7 +14,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@nest-socket/client": ["libs/client/src/index.ts"],
+      "@nest-socket/interfaces": ["libs/interfaces/src/index.ts"],
+      "@nest-socket/nest-server": ["libs/nest-server/src/index.ts"],
+      "@nest-socket/server": ["libs/server/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
