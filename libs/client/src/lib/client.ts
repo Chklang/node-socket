@@ -1,6 +1,6 @@
 import { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
-import { BehaviorSubject, finalize, mergeMap, Observable, of, Subject, switchMap, takeUntil, tap, throwError } from 'rxjs';
-import { INextMessage, TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
+import { BehaviorSubject, finalize, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import { TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import { ConnectorsRegistryService } from './connectors-registry';
 
 type TSocketEvent = 'CONNECTED' | 'NOT CONNECTED' | 'RECONNECTING';

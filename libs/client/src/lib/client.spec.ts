@@ -2,7 +2,6 @@ import { TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } fro
 import * as jestMock from 'jest-mock';
 import { catchError, of, Subject, take, tap } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import { SocketClient } from './client';
 import { ConnectorsRegistryService, IConnector } from './connectors-registry';
 
@@ -28,7 +27,7 @@ jest.mock('socket.io-client', () => {
 });
 describe('SocketClient', () => {
   let service: SocketClient;
-  let ioResult: Socket<DefaultEventsMap, DefaultEventsMap>;
+  let ioResult: Socket<any, any>;
   beforeEach(() => {
     ioResult = createMockInstance(Socket);
   });
@@ -76,7 +75,7 @@ describe('SocketClient', () => {
     let echoService: IConnector<any, any>;
     let mockConnectorsRegistryService: ConnectorsRegistryService;
     let getConnectorSpy: jest.SpyInstance<IConnector<any, any>, [type: string]>;
-    let ioResultEmit: jest.SpyInstance<Socket<DefaultEventsMap, DefaultEventsMap>, [ev: string, ...args: any[]]>;
+    let ioResultEmit: jest.SpyInstance<Socket<any, any>, [ev: string | symbol, ...args: any[]]>;
     let callbackIoOn: (message: any) => void;
     beforeEach(() => {
       echoService = {
