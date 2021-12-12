@@ -1,4 +1,4 @@
-import { TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
+import { TEndMessage, TErrorMessage, TFirstErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import * as jestMock from 'jest-mock';
 import { catchError, of, Subject, take, tap } from 'rxjs';
 import { Socket } from 'socket.io-client';
@@ -43,7 +43,7 @@ describe('SocketClient', () => {
     expect(socketIoMock.io).not.toBeCalled();
   });
   it('Socket is created with first message', () => {
-    expect.assertions(18);
+    expect.assertions(19);
     const ioSpy = jest.spyOn(socketIoMock, 'io').mockReturnValue(ioResult);
     const ioResultOnSpy = jest.spyOn(ioResult, 'on');
     const ioResultEmitSpy = jest.spyOn(ioResult, 'emit');
@@ -53,16 +53,17 @@ describe('SocketClient', () => {
     subject.next('titi');
     expect(ioSpy).toBeCalledTimes(1);
     expect(ioSpy).toBeCalledWith('<url>', { transports: ['websocket'] });
-    expect(ioResultOnSpy).toBeCalledTimes(9);
+    expect(ioResultOnSpy).toBeCalledTimes(10);
     expect(ioResultOnSpy).toHaveBeenNthCalledWith(1, 'connect', expect.anything());
     expect(ioResultOnSpy).toHaveBeenNthCalledWith(2, 'reconnect_attempt', expect.anything());
     expect(ioResultOnSpy).toHaveBeenNthCalledWith(3, 'reconnect', expect.anything());
     expect(ioResultOnSpy).toHaveBeenNthCalledWith(4, 'reconnect_failed', expect.anything());
     expect(ioResultOnSpy).toHaveBeenNthCalledWith(5, 'close', expect.anything());
     expect(ioResultOnSpy).toHaveBeenNthCalledWith(6, 'first-message', expect.anything());
-    expect(ioResultOnSpy).toHaveBeenNthCalledWith(7, 'next-message', expect.anything());
-    expect(ioResultOnSpy).toHaveBeenNthCalledWith(8, 'error-message', expect.anything());
-    expect(ioResultOnSpy).toHaveBeenNthCalledWith(9, 'end-message', expect.anything());
+    expect(ioResultOnSpy).toHaveBeenNthCalledWith(7, 'first-error-message', expect.anything());
+    expect(ioResultOnSpy).toHaveBeenNthCalledWith(8, 'next-message', expect.anything());
+    expect(ioResultOnSpy).toHaveBeenNthCalledWith(9, 'error-message', expect.anything());
+    expect(ioResultOnSpy).toHaveBeenNthCalledWith(10, 'end-message', expect.anything());
     expect(ioResultEmitSpy).toBeCalledTimes(1);
     expect(ioResultEmitSpy.mock.calls[0][0]).toBe('first-message');
     expect(ioResultEmitSpy.mock.calls[0][1]).toBeDefined();
@@ -98,7 +99,7 @@ describe('SocketClient', () => {
     });
     afterEach(() => {
       jest.clearAllMocks();
-    })
+    });
     it('First message from server is ok', () => {
       expect.assertions(14);
       // State of beforeEach
@@ -129,6 +130,29 @@ describe('SocketClient', () => {
       expect(ioResultEmit.mock.calls[2][1]).toBeDefined();
       expect((ioResultEmit.mock.calls[2][1] as TEndMessage).id).toBe('server_1');
       expect((ioResultEmit.mock.calls[2][1] as TEndMessage).content.type).toBe('end-message');
+    });
+    it('First message as error from server is ok', () => {
+      expect.assertions(5);
+      // State of beforeEach
+      expect(ioResultEmit).toBeCalledTimes(1);
+
+      const spyOnMessage = jest.spyOn(echoService, 'onMessage').mockImplementation((obs) => obs.pipe(
+        catchError((content) => {
+          expect(content).toBe('echo-1');
+          return of(content);
+        }),
+      ));
+      callbackIoOn(createMessage<TFirstErrorMessage>({
+        id: 'server_1',
+        content: {
+          type: 'first-error-message',
+          subject: 'echo',
+          error: 'echo-1',
+        }
+      }));
+      expect(getConnectorSpy).toBeCalledTimes(1);
+      expect(spyOnMessage).toBeCalledTimes(1);
+      expect(ioResultEmit).toBeCalledTimes(1); // No reply because nobody listen after throw an error
     });
     it('Next message from server is ok', () => {
       expect.assertions(20);

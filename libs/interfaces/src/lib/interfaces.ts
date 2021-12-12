@@ -1,4 +1,4 @@
-export type TMessagesTypes = 'first-message' | 'next-message' | 'end-message' |'error-message';
+export type TMessagesTypes = 'first-message' | 'first-error-message' | 'next-message' | 'end-message' |'error-message';
 export interface IMessageContent<T extends TMessagesTypes> {
   type: T;
 }
@@ -12,6 +12,11 @@ export interface IFirstMessageContent<Type extends string, Content> extends IMes
   body: Content;
 }
 export interface IFirstMessage<Type extends string, Content> extends IMessage<IFirstMessageContent<Type, Content>> { }
+export interface IFirstErrorMessageContent<Type extends string, Content> extends IMessageContent<'first-error-message'> {
+  subject: Type;
+  error: Content;
+}
+export interface IFirstErrorMessage<Type extends string, Content> extends IMessage<IFirstErrorMessageContent<Type, Content>> { }
 
 export interface INextMessageContent<Content> extends IMessageContent<'next-message'> {
   body: Content;
@@ -21,13 +26,14 @@ export interface INextMessage<Content> extends IMessage<INextMessageContent<Cont
 export interface IEndMessageContent extends IMessageContent<'end-message'> { }
 export interface IEndMessage extends IMessage<IEndMessageContent> { }
 
-export interface IErrorMessageContent extends IMessageContent<'error-message'> {
-  error: string;
+export interface IErrorMessageContent<Content> extends IMessageContent<'error-message'> {
+  error: Content;
 }
-export interface IErrorMessage extends IMessage<IErrorMessageContent> { }
+export interface IErrorMessage<Content> extends IMessage<IErrorMessageContent<Content>> { }
 
 export type TMessage = IMessage<IMessageContent<TMessagesTypes>>;
 export type TFirstMessage = IFirstMessage<string, any>;
+export type TFirstErrorMessage = IFirstErrorMessage<string, any>;
 export type TNextMessage = INextMessage<any>;
 export type TEndMessage = IEndMessage;
-export type TErrorMessage = IErrorMessage;
+export type TErrorMessage = IErrorMessage<any>;

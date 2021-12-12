@@ -16,7 +16,7 @@ describe('ServerService', () => {
     };
     mockConnectorsRegistryService = createMockInstance(ConnectorsRegistryService);
     getConnectorSpy = jest.spyOn(mockConnectorsRegistryService, 'getConnector').mockReturnValue(echoService);
-    server = new ServerService(mockConnectorsRegistryService);
+    server = new ServerService({}, mockConnectorsRegistryService);
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -27,7 +27,9 @@ describe('ServerService', () => {
     const emitSpy = jest.spyOn(client, 'emit');
     const echoSpy = jest.spyOn(echoService, 'onMessage').mockImplementation((req) => {
       return req.pipe(
-        tap((m) => expect(m).toBe('content')),
+        tap((m) => {
+          return expect(m).toBe('content');
+        }),
       );
     });
     server.handleFirstMessage({

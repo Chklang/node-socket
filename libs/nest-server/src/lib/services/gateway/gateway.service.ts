@@ -1,9 +1,10 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
-import { ConnectorsRegistryService } from '../connectors-registry/connectors-registry.service';
+import { Observable, of } from 'rxjs';
 import { Socket } from 'socket.io';
-import { Injectable } from '@nestjs/common';
 import * as Server from '@node-socket/server';
 import { TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@node-socket/interfaces';
+import { ConnectorsRegistryService } from '../connectors-registry/connectors-registry.service';
 
 @Injectable()
 @WebSocketGateway({ transports: ['websocket'] })
@@ -11,9 +12,11 @@ export class GatewayService implements OnGatewayDisconnect {
     private readonly server: Server.ServerService;
 
     public constructor(
+        @Inject('SERVER_CONF')
+        serverConf: Server.IServerParams,
         connect: ConnectorsRegistryService,
     ) {
-        this.server = new Server.ServerService(connect);
+        this.server = new Server.ServerService(serverConf, connect);
     }
 
     public handleDisconnect(client: any) {
@@ -38,6 +41,10 @@ export class GatewayService implements OnGatewayDisconnect {
     @Subscribe('end-message')
     public handleEndMessage(@MessageBody() data: TEndMessage, @ConnectedSocket() client: Socket) {
         return this.server.handleEndMessage(data, client);
+    }
+
+    public sendMessage<Request, Response>(type: string, messages$: Observable<Request>, clients: Observable<string[]> = of([])): Observable<Server.IBroadcastResponse<Response>> {
+        return this.server.sendMessage(type, messages$, clients);
     }
 }
 

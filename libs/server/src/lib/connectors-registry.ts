@@ -18,5 +18,5 @@ export class ConnectorsRegistryService {
 }
 
 export interface IConnector<Request, Response> {
-    onMessage(requests: Observable<Request>): Observable<Response>;
+    onMessage(requests: Observable<Request>, client: string): Observable<Response>;
 }

@@ -7,7 +7,10 @@ describe('GatewayService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [GatewayService, ConnectorsRegistryService],
+      providers: [GatewayService, ConnectorsRegistryService, {
+        provide: 'SERVER_CONF',
+        useValue: {}
+      }],
     }).compile();
 
     service = module.get<GatewayService>(GatewayService);

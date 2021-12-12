@@ -1,6 +1,6 @@
 import { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
-import { BehaviorSubject, finalize, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
-import { TEndMessage, TErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
+import { BehaviorSubject, filter, finalize, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import { TEndMessage, TErrorMessage, TFirstErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import { ConnectorsRegistryService } from './connectors-registry';
 
 type TSocketEvent = 'CONNECTED' | 'NOT CONNECTED' | 'RECONNECTING';
@@ -41,18 +41,15 @@ export class SocketClient {
             const listener = this.listeners[message.id];
             if (listener) {
               switch (message.content.type) {
-                case 'first-message': {
-                  const typed = message as TFirstMessage;
-                  listener.next(typed.content.body);
-                  break;
-                }
+                case 'first-message':
                 case 'next-message': {
-                  const typed = message as TNextMessage;
+                  const typed = message as TFirstMessage | TNextMessage;
                   listener.next(typed.content.body);
                   break;
                 }
+                case 'first-error-message':
                 case 'error-message': {
-                  const typed = message as TErrorMessage;
+                  const typed = message as TErrorMessage | TFirstErrorMessage;
                   listener.error(typed.content.error);
                   delete this.listeners[typed.id];
                   break;
@@ -65,8 +62,7 @@ export class SocketClient {
               }
               return;
             }
-            if (message.content.type === 'first-message') {
-              const typed = message as TFirstMessage;
+            const initCommunication = (typed: TFirstMessage | TFirstErrorMessage, mustReplyBecauseNoError: boolean): Subject<TMessage> | undefined => {
               const service = this.connectorsRegistry.getConnector(typed.content.subject);
               if (!service) {
                 const errorResponse: TErrorMessage = {
@@ -85,6 +81,9 @@ export class SocketClient {
 
               service.onMessage(requests$).subscribe({
                 next: (e) => {
+                  if (!mustReplyBecauseNoError) {
+                    return;
+                  }
                   const message: TNextMessage = {
                     id: typed.id,
                     content: {
@@ -95,6 +94,9 @@ export class SocketClient {
                   socket?.emit(message.content.type, message);
                 },
                 error: (e) => {
+                  if (!mustReplyBecauseNoError) {
+                    return;
+                  }
                   const message: TErrorMessage = {
                     id: typed.id,
                     content: {
@@ -107,6 +109,9 @@ export class SocketClient {
                   delete this.listeners[typed.id];
                 },
                 complete: () => {
+                  if (!mustReplyBecauseNoError) {
+                    return;
+                  }
                   const message: TEndMessage = {
                     id: typed.id,
                     content: {
@@ -118,7 +123,15 @@ export class SocketClient {
                   delete this.listeners[typed.id];
                 }
               });
-              requests$.next(typed.content.body);
+              return requests$;
+            }
+            if (message.content.type === 'first-message') {
+              const typed = message as TFirstMessage;
+              initCommunication(message as TFirstMessage, true)?.next(typed.content.body);
+              return;
+            } else if (message.content.type === 'first-error-message') {
+              const typed = message as TFirstErrorMessage;
+              initCommunication(message as TFirstErrorMessage, false)?.error(typed.content.error);
               return;
             }
             // No receiver
@@ -147,6 +160,7 @@ export class SocketClient {
             this.eventsSockets.next('NOT CONNECTED');
           });
           socket.on('first-message', callback);
+          socket.on('first-error-message', callback);
           socket.on('next-message', callback);
           socket.on('error-message', callback);
           socket.on('end-message', callback);
@@ -173,27 +187,62 @@ export class SocketClient {
     const currentId = this.messagesPrefix + (this.autoIncrement++);
     const responses$ = new Subject<Response>();
     this.listeners[currentId] = responses$;
-    messages$.subscribe((message) => {
-      if (!firstMessageSent) {
-        const firstMessage: TFirstMessage = {
-          id: currentId,
-          content: {
-            type: 'first-message',
-            subject: type,
-            body: message,
+    messages$.subscribe({
+      next: (message) => {
+        if (!firstMessageSent) {
+          const firstMessage: TFirstMessage = {
+            id: currentId,
+            content: {
+              type: 'first-message',
+              subject: type,
+              body: message,
+            }
           }
+          this.sendMessage.next(firstMessage);
+          firstMessageSent = true;
+        } else {
+          const nextMessage: TNextMessage = {
+            id: currentId,
+            content: {
+              type: 'next-message',
+              body: message,
+            }
+          };
+          this.sendMessage.next(nextMessage);
         }
-        this.sendMessage.next(firstMessage);
-        firstMessageSent = true;
-      } else {
-        const nextMessage: TNextMessage = {
-          id: currentId,
-          content: {
-            type: 'next-message',
-            body: message,
+      },
+      error: (err) => {
+        if (!firstMessageSent) {
+          const firstMessage: TFirstErrorMessage = {
+            id: currentId,
+            content: {
+              type: 'first-error-message',
+              subject: type,
+              error: err,
+            }
           }
-        };
-        this.sendMessage.next(nextMessage);
+          this.sendMessage.next(firstMessage);
+        } else {
+          const nextMessage: TErrorMessage = {
+            id: currentId,
+            content: {
+              type: 'error-message',
+              error: err,
+            }
+          };
+          this.sendMessage.next(nextMessage);
+        }
+      },
+      complete: () => {
+        if (firstMessageSent) {
+          const message: TEndMessage = {
+            id: currentId,
+            content: {
+              type: 'end-message',
+            }
+          };
+          this.sendMessage.next(message);
+        }
       }
     });
     return responses$;
