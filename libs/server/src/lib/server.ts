@@ -1,7 +1,8 @@
 import { Socket } from 'socket.io';
 import { catchError, finalize, map, Observable, of, Subject, takeUntil } from 'rxjs';
-import { IErrorMessage, TEndMessage, TErrorMessage, TFirstErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
+import { IErrorMessage, TConnectorBase, TEndMessage, TErrorMessage, TFirstErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import { ConnectorsRegistryService } from './connectors-registry';
+import { IConnector } from '..';
 
 export class ServerService {
   private autoIncrement = 0;
@@ -174,7 +175,7 @@ export class ServerService {
   private getAllClients(): IClient[] {
     return Object.keys(this.clients).map((key) => this.clients[key]);
   }
-  public sendMessage<Request, Response>(type: string, messages$: Observable<Request>, clients: Observable<string[]> = of([])): Observable<IBroadcastResponse<Response>> {
+  public sendMessage<Connector extends TConnectorBase<any, any>>(type: string, messages$: Observable<Connector['request']>, clients: Observable<string[]> = of([])): Observable<IBroadcastResponse<Connector['response']>> {
     const currentId = this.messagesPrefix + (this.autoIncrement++);
     const responses$ = new Subject<[TMessage, string]>();
     this.messagesFromServer[currentId] = responses$;

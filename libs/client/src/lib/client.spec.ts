@@ -73,9 +73,9 @@ describe('SocketClient', () => {
   });
 
   describe('Check client with connectors', () => {
-    let echoService: IConnector<any, any>;
+    let echoService: IConnector<any>;
     let mockConnectorsRegistryService: ConnectorsRegistryService;
-    let getConnectorSpy: jest.SpyInstance<IConnector<any, any>, [type: string]>;
+    let getConnectorSpy: jest.SpyInstance<IConnector<any>, [type: string]>;
     let ioResultEmit: jest.SpyInstance<Socket<any, any>, [ev: string | symbol, ...args: any[]]>;
     let callbackIoOn: (message: any) => void;
     beforeEach(() => {

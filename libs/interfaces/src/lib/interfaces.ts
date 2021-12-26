@@ -37,3 +37,8 @@ export type TFirstErrorMessage = IFirstErrorMessage<string, any>;
 export type TNextMessage = INextMessage<any>;
 export type TEndMessage = IEndMessage;
 export type TErrorMessage = IErrorMessage<any>;
+
+export type TConnectorBase<req, res> = {
+  request: req;
+  response: res;
+}

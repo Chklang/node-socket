@@ -3,8 +3,9 @@ import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, We
 import { Observable, of } from 'rxjs';
 import { Socket } from 'socket.io';
 import * as Server from '@node-socket/server';
-import { TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@node-socket/interfaces';
+import { TConnectorBase, TEndMessage, TErrorMessage, TFirstMessage, TMessagesTypes, TNextMessage } from '@node-socket/interfaces';
 import { ConnectorsRegistryService } from '../connectors-registry/connectors-registry.service';
+import { GatewayEventsListenerService } from '../gateway-events-listener/gateway-events-listener.service';
 
 @Injectable()
 @WebSocketGateway({ transports: ['websocket'] })
@@ -15,11 +16,13 @@ export class GatewayService implements OnGatewayDisconnect {
         @Inject('SERVER_CONF')
         serverConf: Server.IServerParams,
         connect: ConnectorsRegistryService,
+        private readonly gatewayEventsListenerService: GatewayEventsListenerService,
     ) {
         this.server = new Server.ServerService(serverConf, connect);
     }
 
-    public handleDisconnect(client: any) {
+    public handleDisconnect(client: Socket) {
+        this.gatewayEventsListenerService.onDisconnect(client.id);
         return this.server.handleDisconnect(client);
     }
 
@@ -43,7 +46,7 @@ export class GatewayService implements OnGatewayDisconnect {
         return this.server.handleEndMessage(data, client);
     }
 
-    public sendMessage<Request, Response>(type: string, messages$: Observable<Request>, clients: Observable<string[]> = of([])): Observable<Server.IBroadcastResponse<Response>> {
+    public sendMessage<Connector extends TConnectorBase<any, any>>(type: string, messages$: Observable<Connector['request']>, clients: Observable<string[]> = of([])): Observable<Server.IBroadcastResponse<Connector['response']>> {
         return this.server.sendMessage(type, messages$, clients);
     }
 }

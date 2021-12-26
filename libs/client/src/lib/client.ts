@@ -1,6 +1,6 @@
 import { io, ManagerOptions, Socket, SocketOptions } from 'socket.io-client';
 import { BehaviorSubject, filter, finalize, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
-import { TEndMessage, TErrorMessage, TFirstErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
+import { TConnectorBase, TEndMessage, TErrorMessage, TFirstErrorMessage, TFirstMessage, TMessage, TNextMessage } from '@node-socket/interfaces';
 import { ConnectorsRegistryService } from './connectors-registry';
 
 type TSocketEvent = 'CONNECTED' | 'NOT CONNECTED' | 'RECONNECTING';
@@ -182,7 +182,7 @@ export class SocketClient {
     return of(message);
   }
 
-  public send<Request, Response>(type: string, messages$: Observable<Request>): Observable<Response> {
+  public send<Connector extends TConnectorBase<any, any>>(type: string, messages$: Observable<Connector['request']>): Observable<Connector['response']> {
     let firstMessageSent = false;
     const currentId = this.messagesPrefix + (this.autoIncrement++);
     const responses$ = new Subject<Response>();

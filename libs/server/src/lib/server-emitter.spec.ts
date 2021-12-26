@@ -8,8 +8,8 @@ import { ServerService } from './server';
 describe('Server as emitter', () => {
     let server: ServerService;
     let mockConnectorsRegistryService: ConnectorsRegistryService;
-    let echoService: IConnector<any, any>;
-    let getConnectorSpy: jest.SpyInstance<IConnector<any, any>, [type: string]>;
+    let echoService: IConnector<any>;
+    let getConnectorSpy: jest.SpyInstance<IConnector<any>, [type: string]>;
     beforeEach(() => {
         echoService = {
             onMessage: jest.fn().mockReturnValue(new Subject()),
